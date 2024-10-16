@@ -33,7 +33,7 @@ if __name__ == "__main__":
     top_traits = get_top_traits(accumulated_scores)
 
     # Prepare context and obtain analysis
-    context_agent_1 = prepare_context(diary_entries, daily_scores, accumulated_scores, top_traits)
+    context_agent_1 = prepare_context_for_agent_1(diary_entries, daily_scores, accumulated_scores, top_traits)
     latest_entry_date = max(diary_entries.keys())
     tone = determine_tone(daily_scores[latest_entry_date])
     initial_analysis = get_analysis_from_chatgpt(context_agent_1, tone)
