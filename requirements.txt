@@ -1,1 +1,6 @@
+openai
+spacy
+nltk
+scikit-learn
+matplotlib
 
