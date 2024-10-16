@@ -80,6 +80,7 @@ def prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores,
         context_agent_2 += f"{trait}: {score}\n"
     
     # Adding top traits with resource suggestions
+    top_traits_with_resources = get_top_traits_with_resources(accumulated_scores, self_actualization_words, num_traits=5)
     context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
     for trait, score, suggestion in top_traits:
         context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
