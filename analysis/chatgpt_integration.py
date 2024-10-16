@@ -29,7 +29,7 @@ def follow_up_questions(initial_analysis, diary_entries, daily_scores, score_cha
             diary_summary += f"  - {entry}\n"
             
     # Prepare a comprehensive summary of diary entries and analysis details for context
-    context_agent_2 = prepare_context(diary_entries, daily_scores, accumulated_scores, top_traits)
+    context_agent_2 = prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores, top_traits)
     follow_up_prompt = generate_reflective_prompt(top_traits[0][0])  # Assume top_traits is a list of (trait, score)
     print("\nYou can now ask follow-up questions based on this analysis. Type 'exit' to end the conversation.\n")
     
