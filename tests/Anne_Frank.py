@@ -1,6 +1,9 @@
 
 # Anne FrankJun 1929 – Feb 1945
 # Time 100: The most Important people of the 20th Century
-#Jewish Anne Frank hid in 1942 from the Nazis during the occupation of the Netherlands. Two years later she was discovered. In 1945 she died in the Bergen –Belsen concentration camp.
+# Jewish Anne Frank hid in 1942 from the Nazis during the occupation of the Netherlands.
+# Two years later she was discovered. In 1945 she died in the Bergen –Belsen concentration camp.
 # On her thirteenth birthday, just before Anne went into hiding, Anne was presented with a diary. During the two years in hiding, Anne wrote about events in the Secret Annex, but also about her feelings and thoughts.
-# In a unique effort to foster a deeper connection with Anne Frank's diary, this project leverages advanced natural language processing and psychological analysis to explore and illuminate the emotions, thoughts, and inner world captured in her writing. By utilizing a sophisticated module that examines traits and emotional states, this initiative aims to provide readers with a more nuanced understanding of Anne Frank’s experiences. Through this analysis, we hope to bring her story to life in new ways, allowing more people to empathize with her journey and to truly feel the emotions she expressed during one of history’s most challenging periods.  
+# In a unique effort to foster a deeper connection with Anne Frank's diary, this project leverages advanced natural language processing and psychological analysis to explore and illuminate the emotions, thoughts, and inner world captured in her writing. 
+# By utilizing a sophisticated module that examines traits and emotional states, this initiative aims to provide readers with a more nuanced understanding of Anne Frank’s experiences. 
+# Through this analysis, we hope to bring her story to life in new ways, allowing more people to empathize with her journey and to truly feel the emotions she expressed during one of history’s most challenging periods.  
