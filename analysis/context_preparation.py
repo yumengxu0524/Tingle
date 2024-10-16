@@ -40,6 +40,17 @@ def provide_goal_suggestions(top_traits):
     }
     return [suggestions.get(trait, "Keep up the great work!") for trait, _ in top_traits]
 
+def get_top_traits_with_resources(accumulated_scores, self_actualization_words, num_traits=5):
+    sorted_traits = sorted(accumulated_scores.items(), key=lambda item: item[1], reverse=True)[:num_traits]
+    top_traits_with_resources = [(trait, score, suggest_resources(trait, self_actualization_words)) for trait, score in sorted_traits]
+    return top_traits_with_resources
+    
+    # Adding top traits with resource suggestions
+    top_traits_with_resources = get_top_traits_with_resources(accumulated_scores, original_self_actualization_words)
+    context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
+    for trait, score, suggestion in top_traits_with_resources:
+        context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
+
 def prepare_context_for_agent_1(diary_entries, daily_scores, accumulated_scores, top_traits):
     context_agent_1 = "Psychological Analysis of Diary Entries:\n\n"
     context_agent_1 += "Day-to-Day Score Changes:\n"
@@ -57,6 +68,7 @@ def prepare_context_for_agent_1(diary_entries, daily_scores, accumulated_scores,
     context_agent_1 += "\nAnalysis:\nPlease provide a psychological analysis of the diary writer based on the above information."
     return context_agent_1
 
+# Prepare context for ChatGPT
 def prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores, top_traits):
     context_agent_2 = "Psychological Analysis of Diary Entries:\n\n"
     context_agent_2 += "Day-to-Day Score Changes:\n"
@@ -66,6 +78,11 @@ def prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores,
     context_agent_2 += "\nAccumulated Trait Scores:\n"
     for trait, score in accumulated_scores.items():
         context_agent_2 += f"{trait}: {score}\n"
+    
+    # Adding top traits with resource suggestions
+    context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
+    for trait, score, suggestion in top_traits:
+        context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
 
     # Adding weekly summary
     weekly_summary = calculate_weekly_summary(daily_scores)
@@ -78,17 +95,9 @@ def prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores,
     context_agent_2 += "\nGoals and Recommendations:\n"
     for suggestion in goal_suggestions:
         context_agent_2 += f"{suggestion}\n"        
-
+               
+        
     context_agent_2 += "\nAnalysis:\nPlease provide a psychological analysis of the diary writer based on the above information."
     return context_agent_2
 
-def get_top_traits_with_resources(accumulated_scores, self_actualization_words, num_traits=5):
-    sorted_traits = sorted(accumulated_scores.items(), key=lambda item: item[1], reverse=True)[:num_traits]
-    top_traits_with_resources = [(trait, score, suggest_resources(trait, self_actualization_words)) for trait, score in sorted_traits]
-    return top_traits_with_resources
-    
-    # Adding top traits with resource suggestions
-    top_traits_with_resources = get_top_traits_with_resources(accumulated_scores, original_self_actualization_words)
-    context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
-    for trait, score, suggestion in top_traits_with_resources:
-        context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
+
