@@ -1,3 +1,11 @@
+
+import os
+from openai import OpenAI
+client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key="Enter Your OpenAI API key"
+)
+
 import spacy
 import nltk
 from nltk.corpus import wordnet as wn
