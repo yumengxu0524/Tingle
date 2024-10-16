@@ -37,15 +37,21 @@ def calculate_daily_scores(diary_entries, nlp_model, expanded_dict):
 
     return daily_scores
 
+# Function to track changes in emotional scores
 def track_score_changes(daily_scores):
-    prev_scores = None
+    sorted_dates = sorted(daily_scores.keys())
+    previous_day_scores = None
     score_changes = {}
-    for date, scores in daily_scores.items():
-        if prev_scores:
-            score_changes[date] = {trait: scores.get(trait, 0) - prev_scores.get(trait, 0) for trait in scores}
+    for date in sorted_dates:
+        if previous_day_scores is None:
+            score_changes[date] = {trait: 0 for trait in daily_scores[date]}
         else:
-            score_changes[date] = {trait: 0 for trait in scores}
-        prev_scores = scores
+            day_changes = {}
+            for trait, score in daily_scores[date].items():
+                previous_score = previous_day_scores.get(trait, 0)
+                day_changes[trait] = score - previous_score
+            score_changes[date] = day_changes
+        previous_day_scores = daily_scores[date]
     return score_changes
 
 def accumulate_scores(daily_scores):
