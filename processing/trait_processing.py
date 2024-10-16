@@ -16,7 +16,125 @@ class Trait:
 
 # Define the original self_actualization_words dictionary
 original_self_actualization_words = {
-    # (Put your dictionary content here)
+    'Physiological Needs': {
+        'Division 3 (Animal)': {
+            'Pneumativeness': {'words': ['breathing', 'suffocation', 'air', 'respiration'], 'weight': 15},
+            'Alimentiveness': {'words': ['hunger', 'appetite', 'food', 'eating'], 'weight': 15},
+            'Sanativeness': {'words': ['injury', 'disease', 'healing', 'recovery'], 'weight': 12},
+        },
+        'Division 4 (Perceptives)': {
+            'Flavor': {'words': ['taste', 'flavor', 'savory', 'sweet', 'bitter'], 'weight': 8},
+            'Weight': {'words': ['balance', 'climbing', 'stability', 'equilibrium'], 'weight': 6},
+        },
+    },
+    'Safety Needs': {
+        'Division 1 (Domestic)': {
+            'Inhabitiveness': {'words': ['home', 'shelter', 'safety', 'security'], 'weight': 13},
+        },
+        'Division 3 (Animal)': {
+            'Cautiousness': {'words': ['danger', 'prudence', 'risk', 'caution'], 'weight': 12},
+            'Constructiveness': {'words': ['build', 'invent', 'create', 'construct'], 'weight': 10},
+        },
+        'Division 4 (Perceptives)': {
+            'Order': {'words': ['system', 'organization', 'structure', 'arrangement'], 'weight': 9},
+            'Weight': {'words': ['balance', 'climbing', 'weighing', 'scale'], 'weight': 7},
+        },
+    },
+    'Love and Belongingness Needs': {
+        'Division 1 (Domestic)': {
+            'Amativeness': {'words': ['love', 'romance', 'affection', 'intimacy'], 'weight': 14},
+            'Philoprogenitiveness': {'words': ['parental', 'pets', 'children', 'nurturing'], 'weight': 12},
+            'Adhesiveness': {'words': ['friendship', 'sociability', 'loyalty', 'bonding'], 'weight': 13},
+            'Union for life': {'words': ['commitment', 'marriage', 'partnership', 'union'], 'weight': 11},
+        },
+        'Division 5 (Self Perfection)': {
+            'Agreeableness': {'words': ['pleasing', 'agreeable', 'amicable', 'cordial'], 'weight': 9},
+            'Human Nature': {'words': ['kindness', 'empathy', 'compassion', 'generosity'], 'weight': 10},
+            'Benevolence': {'words': ['kindness', 'goodness', 'charity', 'benevolence'], 'weight': 10},
+            'Imitation': {'words': ['copy', 'imitate', 'emulate', 'mimic'], 'weight': 6},
+        },
+        'Division 4 (Perceptives)': {
+            'Language': {'words': ['speak', 'communication', 'dialogue', 'expression'], 'weight': 11},
+        },
+    },
+    'Esteem Needs': {
+        'Division 2 (Aspiring)': {
+            'Self-Esteem': {'words': ['dignity', 'respect', 'pride', 'self-respect'], 'weight': 14},
+            'Approbativeness': {'words': ['ambition', 'esteem', 'recognition', 'approval'], 'weight': 12},
+            'Firmness': {'words': ['perseverance', 'steadfast', 'determination', 'resolve'], 'weight': 10},
+            'Conscientiousness': {'words': ['duty', 'right', 'ethics', 'morality'], 'weight': 11},
+        },
+        'Division 5 (Self Perfection)': {
+            'Agreeableness': {'words': ['pleasing', 'agreeable', 'amicable', 'cordial'], 'weight': 8},
+            'Veneration': {'words': ['respect', 'revere', 'admire', 'honor'], 'weight': 10},
+        },
+        'Division 4 (Perceptives)': {
+            'Tune': {'words': ['music', 'sing', 'melody', 'harmony'], 'weight': 7},
+        },
+    },
+    'Cognitive Needs': {
+        'Division 3 (Animal)': {
+            'Constructiveness': {'words': ['build', 'invent', 'create', 'construct'], 'weight': 9},
+            'Ideality': {'words': ['beauty', 'refinement', 'perfection', 'idealism'], 'weight': 8},
+        },
+        'Division 4 (Perceptives)': {
+            'Form': {'words': ['shape', 'form', 'structure', 'contour'], 'weight': 7},
+            'Individuality': {'words': ['fact', 'identity', 'uniqueness', 'self'], 'weight': 8},
+            'Size': {'words': ['length', 'breadth', 'dimension', 'magnitude'], 'weight': 6},
+            'Locality': {'words': ['places', 'location', 'site', 'position'], 'weight': 6},
+            'Eventuality': {'words': ['events', 'history', 'occurrences', 'developments'], 'weight': 7},
+            'Language': {'words': ['speak', 'communication', 'dialogue', 'expression'], 'weight': 9},
+            'Color': {'words': ['color', 'hue', 'shade', 'tint'], 'weight': 6},
+            'Order': {'words': ['system', 'organization', 'structure', 'arrangement'], 'weight': 8},
+            'Number': {'words': ['arithmetic', 'count', 'calculate', 'numerate'], 'weight': 6},
+            'Time': {'words': ['time', 'dates', 'duration', 'period'], 'weight': 7},
+            'Comparison': {'words': ['compare', 'discriminate', 'differentiate', 'contrast'], 'weight': 8},
+            'Causality': {'words': ['cause', 'effect', 'result', 'consequence'], 'weight': 8},
+        },
+        'Division 5 (Self Perfection)': {
+            'Imitation': {'words': ['copy', 'imitate', 'emulate', 'mimic'], 'weight': 5},
+        },
+    },
+    'Self-Actualization': {
+        'Division 1 (Domestic)': {
+            'Concentrativeness': {'words': ['focus', 'concentrate', 'attention', 'dedication'], 'weight': 11},
+        },
+        'Division 2 (Aspiring)': {
+            'Firmness': {'words': ['perseverance', 'steadfast', 'determination', 'resolve'], 'weight': 12},
+            'Conscientiousness': {'words': ['duty', 'right', 'ethics', 'morality'], 'weight': 13},
+        },
+        'Division 3 (Animal)': {
+            'Ideality': {'words': ['beauty', 'refinement', 'perfection', 'idealism'], 'weight': 9},
+            'Mirthfulness': {'words': ['wit', 'humor', 'fun', 'jocularity'], 'weight': 7},
+        },
+        'Division 4 (Perceptives)': {
+            'Causality': {'words': ['cause', 'effect', 'result', 'consequence'], 'weight': 8},
+            'Tune': {'words': ['music', 'sing', 'melody', 'harmony'], 'weight': 6},
+        },
+        'Division 5 (Self Perfection)': {
+            'Spirituality': {'words': ['faith', 'wonder', 'spirit', 'divinity'], 'weight': 12},
+            'Human Nature': {'words': ['kindness', 'empathy', 'compassion', 'generosity'], 'weight': 10},
+            'Veneration': {'words': ['respect', 'revere', 'admire', 'honor'], 'weight': 11},
+            'Benevolence': {'words': ['kindness', 'goodness', 'charity', 'benevolence'], 'weight': 9},
+            'Creed': {'words': ['belief', 'creed', 'faith', 'doctrine'], 'weight': 10},
+        },
+    },
+    'Transcendence': {
+        'Division 5 (Self Perfection)': {
+            'Spirituality': {'words': ['faith', 'wonder', 'spirit', 'divinity'], 'weight': 13},
+            'Creed': {'words': ['belief', 'creed', 'faith', 'doctrine'], 'weight': 11},
+        },
+    },
+    'Emotional Response': {
+        'Division 6 (Emotions)': {
+            'Anger': {'words': ['angry', 'rage', 'furious'], 'weight': 20},
+            'Happiness': {'words': ['happy', 'joy', 'elated'], 'weight': 20},
+            'Sadness': {'words': ['sad', 'depressed', 'down'], 'weight': 20},
+            'Fear': {'words': ['fear', 'scared', 'frightened'], 'weight': 20},
+            'Surprise': {'words': ['surprised', 'shocked', 'astonished'], 'weight': 20},
+            'Disgust': {'words': ['disgusted', 'revolted', 'repelled'], 'weight': 20},
+        }
+    }
 }
 
 def get_synonyms(word):
