@@ -62,4 +62,6 @@ def accumulate_scores(daily_scores):
     return accumulated_scores
 
 def get_top_traits(accumulated_scores, num_traits=5):
-    return sorted(accumulated_scores.items(), key=lambda item: item[1], reverse=True)[:num_traits]
+    # Sort traits by accumulated scores in descending order and pick the top 'num_traits'
+    sorted_traits = sorted(accumulated_scores.items(), key=lambda item: item[1], reverse=True)
+    return sorted_traits[:num_traits]
