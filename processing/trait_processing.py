@@ -200,3 +200,42 @@ def find_all_similar_traits_with_sentence(sentence_vector, expanded_dict, positi
     return impacting_traits
 
 
+# Consolidated module to adjust score using fuzzy logic and time-dependent factors
+def consolidated_module(trait_name, current_score, cumulative_score, days_since_entry, base_decay=0.8):
+    """
+    Adjusts the weight of a trait by applying an age-dependent decay factor for previous cumulative scores,
+    so that older data decays faster and scores with less impact decay more quickly.
+
+    Args:
+        trait_name (str): The name of the trait.
+        current_score (float): The impact score for the current day.
+        cumulative_score (float): The cumulative score for the trait up to the current day.
+        days_since_entry (int): The number of days since the diary entry.
+        base_decay (float): The base decay factor for recent data, modified by the age of the data.
+
+    Returns:
+        float: The adjusted cumulative score with accelerated decay for less impacted data.
+    """
+    # Adjust decay based on current score
+    if current_score <= 200:  # Apply more decay for lower current scores
+        age_decay_factor = (base_decay ** 2) ** (1 + (days_since_entry / 30))
+    else:  # Standard decay for higher current scores
+        age_decay_factor = base_decay ** (1 + (days_since_entry / 30))
+
+    decayed_score = cumulative_score * age_decay_factor
+
+    # Combine decayed score with current impact
+    combined_score = decayed_score + current_score
+
+    # Apply fuzzy logic adjustments based on the combined score
+    if combined_score > 250:  # High combined score, moderate increase
+        combined_score *= 1.3  # Increase by 10%
+    elif 200 < combined_score <= 250:  # Moderate score, slight increase
+        combined_score *= 1.05  # Increase by 5%
+    elif combined_score <= 100:  # Low score, slight decrease
+        combined_score *= 0.75  # Decrease by 5%
+
+    # Ensure the combined score remains within reasonable bounds, e.g., between 5 and 20
+    combined_score = max(5, min(1000, combined_score))
+    return combined_score
+
