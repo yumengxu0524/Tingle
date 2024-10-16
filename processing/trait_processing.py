@@ -177,25 +177,37 @@ def expand_dictionary_with_synonyms(self_actualization_words):
 # Initialize expanded_dict with the provided dictionary structure
 expanded_dict = expand_dictionary_with_synonyms(original_self_actualization_words)
 
+# Function to filter dictionary branches based on relativeness threshold
 def filter_dict_by_relativeness(expanded_dict, sentence_vector, relativeness_threshold):
     filtered_dict = {}
     for need, divisions in expanded_dict.items():
+        need_relative_score = 0
         filtered_divisions = {}
         for division, traits in divisions.items():
+            division_relative_score = 0
             filtered_traits = {}
             for trait, data in traits.items():
-                trait_score = sum(
-                    cosine_similarity([sentence_vector], [nlp(word).vector])[0][0]
-                    for word in data['words']
-                ) / len(data['words'])
-                if trait_score >= relativeness_threshold:
+                trait_relative_score = 0
+                for word in data['words']:
+                    word_vector_in_dict = nlp(word).vector
+                    similarity = cosine_similarity([sentence_vector], [word_vector_in_dict])[0][0]
+                    trait_relative_score += similarity
+                trait_relative_score /= len(data['words'])
+                if trait_relative_score >= relativeness_threshold:
                     filtered_traits[trait] = data
+                    division_relative_score += trait_relative_score
             if filtered_traits:
-                filtered_divisions[division] = filtered_traits
+                division_relative_score /= len(filtered_traits)
+                if division_relative_score >= relativeness_threshold:
+                    filtered_divisions[division] = filtered_traits
+                    need_relative_score += division_relative_score
         if filtered_divisions:
-            filtered_dict[need] = filtered_divisions
+            need_relative_score /= len(filtered_divisions)
+            if need_relative_score >= relativeness_threshold:
+                filtered_dict[need] = filtered_divisions
     return filtered_dict
 
+# Function to find all divisions that are similar above or below the thresholds
 def find_all_similar_traits_with_sentence(sentence_vector, expanded_dict, positive_threshold, negative_threshold):
     impacting_traits = {}
     for need, divisions in expanded_dict.items():
@@ -203,7 +215,8 @@ def find_all_similar_traits_with_sentence(sentence_vector, expanded_dict, positi
             for trait, data in traits.items():
                 weight = data['weight']
                 for word in data['words']:
-                    similarity = cosine_similarity([sentence_vector], [nlp(word).vector])[0][0]
+                    word_vector_in_dict = nlp(word).vector
+                    similarity = cosine_similarity([sentence_vector], [word_vector_in_dict])[0][0]
                     weighted_similarity = similarity * weight
                     if weighted_similarity >= positive_threshold or weighted_similarity <= negative_threshold:
                         if need not in impacting_traits:
@@ -211,10 +224,17 @@ def find_all_similar_traits_with_sentence(sentence_vector, expanded_dict, positi
                         if division not in impacting_traits[need]:
                             impacting_traits[need][division] = {}
                         if trait not in impacting_traits[need][division]:
-                            impacting_traits[need][division][trait] = {'similar_words': [], 'weight': weight}
-                        impacting_traits[need][division][trait]['similar_words'].append(
-                            (word, similarity, weighted_similarity)
-                        )
+                            impacting_traits[need][division][trait] = {
+                                'similar_words': [],
+                                'weight': weight
+                            }
+                        impacting_traits[need][division][trait]['similar_words'].append((word, similarity, weighted_similarity))
+                         # Print calculations specifically for "Cautiousness"
+                        #if trait == "Cautiousness":
+                          #  print(f"Word: {word}")
+                          #  print(f"  Similarity: {similarity}")
+                          #  print(f"  Weight: {weight}")
+                          #  print(f"  Weighted Similarity: {weighted_similarity}")
     return impacting_traits
 
 
