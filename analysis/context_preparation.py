@@ -66,12 +66,6 @@ def prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores,
     context_agent_2 += "\nAccumulated Trait Scores:\n"
     for trait, score in accumulated_scores.items():
         context_agent_2 += f"{trait}: {score}\n"
-    
-    # Adding top traits with resource suggestions
-    top_traits_with_resources = get_top_traits_with_resources(accumulated_scores, original_self_actualization_words)
-    context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
-    for trait, score, suggestion in top_traits_with_resources:
-        context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
 
     # Adding weekly summary
     weekly_summary = calculate_weekly_summary(daily_scores)
@@ -92,4 +86,9 @@ def get_top_traits_with_resources(accumulated_scores, self_actualization_words, 
     sorted_traits = sorted(accumulated_scores.items(), key=lambda item: item[1], reverse=True)[:num_traits]
     top_traits_with_resources = [(trait, score, suggest_resources(trait, self_actualization_words)) for trait, score in sorted_traits]
     return top_traits_with_resources
-
+    
+    # Adding top traits with resource suggestions
+    top_traits_with_resources = get_top_traits_with_resources(accumulated_scores, original_self_actualization_words)
+    context_agent_2 += "\nTop Traits with Resource Suggestions:\n"
+    for trait, score, suggestion in top_traits_with_resources:
+        context_agent_2 += f"{trait} (Score: {score}): {suggestion}\n"
