@@ -22,7 +22,10 @@ class Trait:
     words: list
     weight: float
 
-# Define the original self_actualization_words dictionary
+# Initialize the multi-layer dictionary with default dictionaries
+self_actualization_words = defaultdict(lambda: defaultdict(lambda: defaultdict(Trait)))
+
+# Original self_actualization_words dictionary setup with initial trait definitions
 original_self_actualization_words = {
     'Physiological Needs': {
         'Division 3 (Animal)': {
@@ -145,6 +148,8 @@ original_self_actualization_words = {
     }
 }
 
+
+# Function to find synonyms using WordNet
 def get_synonyms(word):
     synonyms = set()
     for syn in wn.synsets(word):
@@ -152,20 +157,25 @@ def get_synonyms(word):
             synonyms.add(lemma.name().replace('_', ' '))
     return synonyms
 
-def expand_dictionary_with_synonyms():
+# Function to expand the dictionary with synonyms
+def expand_dictionary_with_synonyms(self_actualization_words):
     expanded_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
-    for need, divisions in original_self_actualization_words.items():
+    for need, divisions in self_actualization_words.items():
         for division, traits in divisions.items():
             for trait, data in traits.items():
                 words = data['words']
                 expanded_dict[need][division][trait] = {
-                    'words': [], 'weight': data['weight']
+                    'words': [],
+                    'weight': data['weight']
                 }
                 for word in words:
                     synonyms = get_synonyms(word)
                     expanded_dict[need][division][trait]['words'].extend(synonyms)
                 expanded_dict[need][division][trait]['words'] = list(set(expanded_dict[need][division][trait]['words']))
     return expanded_dict
+
+# Initialize expanded_dict with the provided dictionary structure
+expanded_dict = expand_dictionary_with_synonyms(original_self_actualization_words)
 
 def filter_dict_by_relativeness(expanded_dict, sentence_vector, relativeness_threshold):
     filtered_dict = {}
