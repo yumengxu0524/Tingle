@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tingle Diary and Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form, .chat-section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #chat-box {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            text-align: right;
+            color: blue;
+        }
+        .bot-message {
+            text-align: left;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Submit Your Diary</h1>
+
+    <form id="diaryForm">
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" required>
+
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" rows="5" required></textarea>
+
+        <label for="time">Date (optional, format YYYY-MM-DD):</label>
+        <input type="text" id="time" name="time">
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="response"></div>
+
+    <h2>Follow-Up Questions</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="user-question" placeholder="Ask a follow-up question..." />
+    <button id="ask-question">Ask</button>
+
+    <script>
+        const form = document.getElementById('diaryForm');
+        const chatBox = document.getElementById('chat-box');
+        const userQuestionInput = document.getElementById('user-question');
+        const askButton = document.getElementById('ask-question');
+
+        // Handle Diary Submission
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            
+            const formData = {
+                user_id: document.getElementById('user_id').value,
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                time: document.getElementById('time').value || null
+            };
+
+            const responseDiv = document.getElementById('response');
+
+            try {
+                const response = await fetch('/submit_entry/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    responseDiv.innerHTML = `<p>Entry submitted successfully. ID: ${result.id}</p>`;
+                } else {
+                    responseDiv.innerHTML = `<p>Error: ${result.detail}</p>`;
+                }
+            } catch (error) {
+                console.error("Error during fetch:", error);
+                responseDiv.innerHTML = `<p>Request failed. Error: ${error.message}</p>`;
+            }
+        });
+
+        // Handle Follow-Up Questions
+        askButton.addEventListener('click', async function () {
+            const userQuestion = userQuestionInput.value.trim();
+            if (!userQuestion) return;
+
+            // Display user question in the chat
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.innerText = userQuestion;
+            chatBox.appendChild(userMessageDiv);
+
+            try {
+                const response = await fetch('/ask_follow_up/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: userQuestion })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    // Display bot response in the chat
+                    const botMessageDiv = document.createElement('div');
+                    botMessageDiv.className = 'message bot-message';
+                    botMessageDiv.innerText = result.answer;
+                    chatBox.appendChild(botMessageDiv);
+                } else {
+                    const errorMessageDiv = document.createElement('div');
+                    errorMessageDiv.className = 'message bot-message';
+                    errorMessageDiv.innerText = 'Error: ' + result.error;
+                    chatBox.appendChild(errorMessageDiv);
+                }
+            } catch (error) {
+                console.error("Error during fetch:", error);
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'message bot-message';
+                errorMessageDiv.innerText = 'Error: ' + error.message;
+                chatBox.appendChild(errorMessageDiv);
+            }
+
+            userQuestionInput.value = '';
+        });
+    </script>
+
+</body>
+</html>
