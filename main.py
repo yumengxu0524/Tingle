@@ -1,45 +1,140 @@
-from analysis.analysis import calculate_daily_scores, track_score_changes, accumulate_scores, get_top_traits
-from processing.trait_processing import expand_dictionary_with_synonyms
-from utils.utils import load_nlp_model
-from analysis.context_preparation import prepare_context, prepare_context_for_agent_2
-from analysis.chatgpt_integration import get_analysis_from_chatgpt, determine_tone, follow_up_questions
+from fastapi import FastAPI, WebSocket, HTTPException, Request
+from pydantic import BaseModel
+from pymongo import MongoClient
+from datetime import datetime
+from dateutil import parser
+from typing import Optional, List
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+import logging
 
-import datetime
+# Import from your psychological analysis module
+from Tingle_Brain_A_Agent_One import (nlp_model, expanded_dict, calculate_daily_scores, follow_up_questions,
+                                      track_score_changes, accumulate_scores, get_top_traits, determine_tone, prepare_context_for_agent_1, 
+                                      prepare_context_for_agent_2,get_analysis_from_chatgpt)
+# MongoDB connection
+client = MongoClient("mongodb://localhost:27017")
+db = client['mydatabase']
+collection = db['entries']
+
+# FastAPI application
+app = FastAPI()
+
+# Serve static files (for frontend)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+class Entry(BaseModel):
+    user_id: str                                        
+    title: str
+    content: str
+    time: Optional[str] = None
+
+@app.get("/")
+def root():
+    # Serve the index.html file
+    with open("static/index.html", "r") as f:
+        return HTMLResponse(content=f.read(), status_code=200)
+
+# Log any MongoDB-related operations
+logging.basicConfig(level=logging.DEBUG)
+
+@app.post("/submit_entry/")
+def submit_entry(entry: Entry):
+    try:
+        logging.debug("Inserting entry into MongoDB")
+        # Parse time or use current date if not provided
+        entry_time = parser.parse(entry.time).strftime("%Y-%m-%d") if entry.time else datetime.now().strftime("%Y-%m-%d")
+
+        # Insert entry into MongoDB
+        result = collection.insert_one({
+            "user_id": entry.user_id,
+            "title": entry.title,
+            "content": entry.content,
+            "time": entry_time
+        })
+
+        if result:
+            logging.debug(f"Entry inserted with ID: {str(result.inserted_id)} for user: {entry.user_id}")
+
+            # Fetch diary entries from MongoDB
+            diary_entries = fetch_diary_entries(entry.user_id)
+            
+            # Calculate daily scores
+            daily_scores = calculate_daily_scores(diary_entries, nlp_model, expanded_dict)
+
+            # Get the accumulated scores and top traits
+            accumulated_scores = accumulate_scores(daily_scores)
+            top_traits = get_top_traits(accumulated_scores)
+
+            # Determine the tone based on the latest diary entry
+            latest_entry_date = max(diary_entries.keys())
+            tone = determine_tone(daily_scores[latest_entry_date])
+
+            # Prepare the context for context_agent_1 (initial psychological analysis)
+            context_agent_1 = prepare_context_for_agent_1(diary_entries, daily_scores, accumulated_scores, top_traits)
+            analysis = get_analysis_from_chatgpt(context_agent_1)
+
+            # Prepare the context for context_agent_2 (follow-up conversation)
+            context_agent_2 = prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores, top_traits, tone)
+
+            # Optionally, trigger the follow-up question interaction
+            follow_up_questions(analysis, diary_entries, daily_scores, None, accumulated_scores, top_traits, tone)
+
+            # Return the analysis and success message
+            return {"message": "Entry submitted and analyzed successfully", "analysis": analysis}
+        else:
+            logging.error("Entry submission failed")
+            raise HTTPException(status_code=500, detail="Entry submission failed")
+    
+    except Exception as e:
+        logging.error(f"Exception occurred: {e}")
+        # Handle exceptions gracefully with a detailed message
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
+@app.get("/data/{user_id}")
+def get_data(user_id: str):
+    try:
+        data = list(collection.find({"user_id": user_id}, {"_id": 0}))  # Exclude MongoDB _id from the result
+        if not data:
+            return {"message": "No data found for user"}
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# WebSocket for real-time chat
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    await websocket.send_text("Connected to the Tingle chat. You can now ask follow-up questions.")
+    
+    while True:
+        data = await websocket.receive_text()
+        if data.lower() == "exit":
+            await websocket.send_text("Goodbye!")
+            break
+
+        # Placeholder response for follow-up questions
+        response = f"Received: {data}. Analysis will be provided soon."
+        await websocket.send_text(response)
+
+# Function to fetch diary entries from MongoDB
+def fetch_diary_entries(user_id: str):
+    entries = collection.find({"user_id": user_id})
+    diary_entries = {}
+    for entry in entries:
+        diary_entries[datetime.strptime(entry['time'], '%Y-%m-%d').date()] = [entry['content']]
+    return diary_entries
 
 if __name__ == "__main__":
-    diary_entries = {
-        datetime.date(2024, 6, 20): ["I hope I will be able to confide everything to you, as I have never been able to confide in anyone, and I hope you will be a great source of comfort and support."],
-        datetime.date(2024, 6, 21): ["Writing in a diary is a really strange experience for someone like me. Not only because I've never written anything before, but also because it seems to me that later on neither I nor anyone else will be interested in the musings of a thirteen-year-old schoolgirl. Oh well, it doesn't matter. I feel like writing."],
-        datetime.date(2024, 7, 8): ["Dearest Kitty, Our entire family was surprised yesterday morning by the sudden announcement of my sister Margot that she had received a call-up notice from the SS. Fortunately, it's only Margot who's been called up, but that doesn't mean that I won't get one too. Daddy already has a plan to hide us in the building of the company he works for."],
-        datetime.date(2024, 8, 3): ["Dearest Kitty, The van Daans arrived on the seventh. This morning, when I was upstairs making the beds, the van Daans' son, Peter, came in. Peter is almost sixteen, a shy, awkward boy whose company won't amount to much, I thought. Yet, who knows, maybe he'll be a pleasant comrade. He's currently the only young person here."],
-        datetime.date(2024, 10, 1): ["Dear Kitty, So much has happened it's as if the whole world had suddenly turned upside down. But as you see, Kitty, I'm still alive, and that's the main thing, Father says. I'm alive all right, but don't ask where or how. You probably don't understand that I'm alive more in spite of everything than because of it."],
-        datetime.date(2024, 10, 16): ["Dear Kitty, Mr. Dussel and I had another of our little differences yesterday. I must honestly admit that I don't like him much; he's pedantic, argumentative, and clumsy, old-fashioned, and just a little bit boring. I'm always running into him whenever I turn around, and it annoys me."],
-        datetime.date(2024, 10, 16): ["Dear Kitty, I've reached the point where I hardly care whether I live or die. The world will keep on turning without me, and I can't do anything to change events anyway. I'll just let matters take their course and concentrate on studying and hope that everything will be all right in the end."]
-    }
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
 
-    # Initialize NLP model and dictionary
-    nlp_model = load_nlp_model()
-    expanded_dict = expand_dictionary_with_synonyms()
 
-    # Define thresholds
-    positive_threshold = 5
-    negative_threshold = -1
-    relativeness_threshold = 0.2
-
-    # Perform the analysis
-    daily_scores = calculate_daily_scores(diary_entries, nlp_model, expanded_dict, relativeness_threshold, positive_threshold, negative_threshold)
-    score_changes = track_score_changes(daily_scores)
-    accumulated_scores = accumulate_scores(daily_scores)
-    top_traits = get_top_traits(accumulated_scores)
-
-    # Prepare context and obtain analysis
-    context_agent_1 = prepare_context_for_agent_1(diary_entries, daily_scores, accumulated_scores, top_traits)
-    latest_entry_date = max(diary_entries.keys())
-    tone = determine_tone(daily_scores[latest_entry_date])
-    initial_analysis = get_analysis_from_chatgpt(context_agent_1, tone)
-    
-    print("ChatGPT Analysis:\n", initial_analysis)
-
-    context_agent_2 = prepare_context_for_agent_2(diary_entries, daily_scores, accumulated_scores, top_traits)
-    follow_up_questions(initial_analysis, diary_entries, daily_scores, score_changes, accumulated_scores, top_traits)
-
+# access the FastAPI app at http://127.0.0.1:8000/ and MongoDB data via http://127.0.0.1:8000/data.
+# http://127.0.0.1:8000/docs 
+# conda activate my_env
+# uvicorn main:app --reload
