@@ -1,9 +1,8 @@
-
 import os
 from openai import OpenAI
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key="enter your api"
+    api_key="enter your OPENAI_API_KEY"
 )
 import datetime
 import spacy
