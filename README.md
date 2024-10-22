@@ -4,8 +4,8 @@
 
 The project is still in development. 
 For test and study purpose please refer to 
-  main.py 
-  Tingle_Brain_A_Agent_One.py
+  main.py, 
+  Tingle_Brain_A_Agent_One.py, and
   index.html
   
 
